@@ -60,7 +60,14 @@ var C3Chart = function (_React$Component) {
     key: 'destroyChart',
     value: function destroyChart() {
       try {
-        this.chart = this.chart.destroy();
+      // A workaround for a case, where the chart might be still in transition
+      // phase while unmounting/destroying - destroying right away leads
+      // to issue described in https://github.com/bcbcarl/react-c3js/issues/22.
+      // Delaying the destroy a bit seems to resolve the issue.
+      // The chart API methods are already bind explicitly, therefore we don't need
+      // any special handling when passing the function.
+        setTimeout(this.chart.destroy, 1000);
+        this.chart = null;
       } catch (err) {
         throw new Error('Internal C3 error', err);
       }
